@@ -1,11 +1,28 @@
 // pages/dashboard.tsx
+"use client";
+
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Head from "next/head";
 
 export default function Dashboard() {
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    // Redireciona para a home se não estiver logado
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            router.push("/");
+        }
+    }, [status, router]);
+
+    if (status === "loading") {
+        return <p>Carregando...</p>;
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center">
-
             <Head>
                 <title>Painel de tarefas</title>
             </Head>
@@ -29,20 +46,10 @@ export default function Dashboard() {
 
                 {/* Lista de tarefas */}
                 <ul className="space-y-2">
-
-                    <li
-                        key='1'
-                        className="flex justify-between items-center bg-gray-50 p-3 rounded-lg"
-                    >
+                    <li className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
                         <span className="text-gray-700">Tarefa</span>
-                        <button
-                            className="text-red-500 hover:text-red-700"
-
-                        >
-                            Remover
-                        </button>
+                        <button className="text-red-500 hover:text-red-700">Remover</button>
                     </li>
-
                 </ul>
             </div>
         </div>
