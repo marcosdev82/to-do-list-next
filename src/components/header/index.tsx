@@ -6,9 +6,9 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { FaGithub } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import logo from "../../../public/to-do-list.png";
+import Avatar from "../avatar";
 
 export default function Header() {
-    // useSession é client-side, então estamos ok com "use client"
     const { data: session, status } = useSession();
 
     return (
@@ -25,15 +25,18 @@ export default function Header() {
 
             {/* Navegação */}
             <nav className="flex items-center gap-4 text-black">
-                {/* Link Painel de tarefas só para usuários logados */}
-                {session ? (
+                {session?.user && (
                     <>
                         <Link href="/dashboard" className="hover:underline">
                             Painel de tarefas
                         </Link>
                         <span className="text-gray-400">|</span>
+                        <Avatar
+                            image={session.user.image ?? ""}
+                            name={session.user.name ?? "Usuário"}
+                        />
                     </>
-                ) : null}
+                )}
 
                 {/* Login / Logout */}
                 {status === "loading" ? null : session ? (

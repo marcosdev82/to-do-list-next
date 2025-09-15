@@ -1,25 +1,26 @@
 // pages/dashboard.tsx
 "use client";
 
-import { useEffect } from "react";
-import { useSession } from "next-auth/react";
+// import { useEffect } from "react";
+import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Head from "next/head";
+import { GetServerSideProps } from "next";
 
 export default function Dashboard() {
-    const { data: session, status } = useSession();
-    const router = useRouter();
+    // const { data: session, status } = useSession();
+    // const router = useRouter();
 
     // Redireciona para a home se não estiver logado
-    useEffect(() => {
-        if (status === "unauthenticated") {
-            router.push("/");
-        }
-    }, [status, router]);
+    // useEffect(() => {
+    //     if (status === "unauthenticated") {
+    //         router.push("/");
+    //     }
+    // }, [status, router]);
 
-    if (status === "loading") {
-        return <p>Carregando...</p>;
-    }
+    // if (status === "loading") {
+    //     return <p>Carregando...</p>;
+    // }
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center">
@@ -54,4 +55,25 @@ export default function Dashboard() {
             </div>
         </div>
     );
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+
+    const session = await getSession({ req })
+
+    console.log(req, session)
+
+    if (!session?.user) {
+        return {
+            redirect: {
+                destination: "/",
+                permanent: false,
+            }
+        }
+    }
+
+    return {
+        props: {},
+    }
+
 }
