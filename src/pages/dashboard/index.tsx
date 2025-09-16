@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import Head from "next/head";
 import { GetServerSideProps } from "next";
 import { Textarea } from "@/components/form";
+import { FiShare2 } from "react-icons/fi"
+import { FaTrash } from "react-icons/fa";
 
 export default function Dashboard() {
     // const { data: session, status } = useSession();
@@ -52,18 +54,59 @@ export default function Dashboard() {
 
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white px-6 py-2 rounded-xl self-start hover:bg-blue-700 transition-colors"
+                        className="bg-blue-600 text-white px-4 py-1 rounded-xl self-start hover:bg-blue-700 transition-colors"
                     >
                         Adicionar
                     </button>
                 </form>
                 {/* Lista de tarefas */}
-                <ul className="space-y-2">
-                    <li className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                        <span className="text-gray-700">Tarefa</span>
-                        <button className="text-red-500 hover:text-red-700">Remover</button>
+                <ul className="space-y-3">
+                    <li className="flex flex-col justify-between items-start bg-gray-60 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+
+                        {/* Esquerda: status + compartilhar */}
+                        <div className="flex flex-row items-center gap-2 mb-2">
+                            <span className="bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                                Público
+                            </span>
+                            <button
+                                className="flex items-center gap-1 text-blue-500 hover:text-blue-700 transition"
+                                aria-label="Compartilhar tarefa"
+                            >
+                                <FiShare2 size={16} />
+                            </button>
+                        </div>
+
+                        <div className="flex items-center justify-between w-full">
+
+                            <p className="text-gray-800  truncate">
+                                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                            </p>
+
+                            <button
+                                className="text-red-500 hover:text-red-700 transition"
+                                aria-label="Remover tarefa"
+                            >
+                                <FaTrash size={16} />
+                            </button>
+                        </div>
+
+                    </li>
+                    <li className="flex flex-col justify-between items-start bg-gray-60 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+
+                        {/* Esquerda: status + compartilhar */}
+
+
+                        <div className="flex items-center justify-between w-full">
+
+                            <p className="text-gray-800  truncate">
+                                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                            </p>
+
+                        </div>
+
                     </li>
                 </ul>
+
             </div>
         </div>
     );
