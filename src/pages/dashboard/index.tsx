@@ -1,17 +1,24 @@
 // pages/dashboard.tsx
 "use client";
 
-import { getSession, useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import Head from "next/head";
 import { GetServerSideProps } from "next";
 import { Textarea } from "@/components/form";
 import { FiShare2 } from "react-icons/fi"
 import { FaTrash } from "react-icons/fa";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 
 import { db } from '../../services/firebaseConnection'
 
-import { addDoc, collection } from 'firebase/firestore';
+import {
+    addDoc,
+    collection,
+    query,
+    orderBy,
+    where,
+    onSnapshot,
+} from 'firebase/firestore';
 
 interface HomeProps {
     user: {
@@ -19,10 +26,49 @@ interface HomeProps {
     }
 }
 
+interface TaskProps {
+    id: string;
+    created: Date;
+    public: boolean;
+    tarefa: string;
+    user: string;
+}
+
 export default function Dashboard({ user }: HomeProps) {
 
     const [input, setInput] = useState("")
     const [publicTask, setPublicTask] = useState(false)
+    const [tasks, setTasks] = useState<TaskProps[]>([])
+
+    useEffect(() => {
+        async function loadTarefas() {
+            const tarefasRef = collection(db, "tarefas")
+            const q = query(
+                tarefasRef,
+                orderBy("created", "desc"),
+                where("user", "==", user?.email),
+
+            )
+
+            onSnapshot(q, (snapshot) => {
+                let lista = [] as TaskProps[]
+
+                snapshot.forEach((doc) => {
+                    lista.push({
+                        id: doc.id,
+                        tarefa: doc.data().tarefa,
+                        created: doc.data().created,
+                        public: doc.data().public,
+                        user: doc.data().user
+                    });
+                });
+
+                setTasks(lista)
+            })
+        }
+
+        loadTarefas()
+    }, [user?.email])
 
     function handleChangePublic(event: ChangeEvent<HTMLInputElement>) {
         console.log(event.target.checked)
@@ -38,7 +84,7 @@ export default function Dashboard({ user }: HomeProps) {
             await addDoc(collection(db, "tarefas"), {
                 tarefa: input,
                 created: new Date(),
-                user: user,
+                user: user?.email,
                 public: publicTask
             });
         } catch (err) {
@@ -87,56 +133,45 @@ export default function Dashboard({ user }: HomeProps) {
                         Adicionar
                     </button>
                 </form>
-                {/* Lista de tarefas */}
+
                 <ul className="space-y-3">
-                    <li className="flex flex-col justify-between items-start bg-gray-60 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                    {tasks.map((item) => (
+                        <li key={item.id} className="flex flex-col justify-between items-start bg-gray-60 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
 
-                        {/* Esquerda: status + compartilhar */}
-                        <div className="flex flex-row items-center gap-2 mb-2">
-                            <span className="bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-                                Público
-                            </span>
-                            <button
-                                className="flex items-center gap-1 text-blue-500 hover:text-blue-700 transition"
-                                aria-label="Compartilhar tarefa"
-                            >
-                                <FiShare2 size={16} />
-                            </button>
-                        </div>
+                            {item.public && (
+                                <div className="flex flex-row items-center gap-2 mb-2">
+                                    <span className="bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                                        Público
+                                    </span>
+                                    <button
+                                        className="flex items-center gap-1 text-blue-500 hover:text-blue-700 transition"
+                                        aria-label="Compartilhar tarefa"
+                                    >
+                                        <FiShare2 size={16} />
+                                    </button>
+                                </div>
+                            )}
+                            <div className="flex items-center justify-between w-full">
 
-                        <div className="flex items-center justify-between w-full">
+                                <p className="text-gray-800  truncate">
+                                    {item.tarefa}
+                                </p>
 
-                            <p className="text-gray-800  truncate">
-                                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                            </p>
+                                <button
+                                    className="text-red-500 hover:text-red-700 transition"
+                                    aria-label="Remover tarefa"
+                                >
+                                    <FaTrash size={16} />
+                                </button>
+                            </div>
 
-                            <button
-                                className="text-red-500 hover:text-red-700 transition"
-                                aria-label="Remover tarefa"
-                            >
-                                <FaTrash size={16} />
-                            </button>
-                        </div>
+                        </li>
+                    ))}
 
-                    </li>
-                    <li className="flex flex-col justify-between items-start bg-gray-60 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
-
-                        {/* Esquerda: status + compartilhar */}
-
-
-                        <div className="flex items-center justify-between w-full">
-
-                            <p className="text-gray-800  truncate">
-                                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                            </p>
-
-                        </div>
-
-                    </li>
                 </ul>
 
             </div>
-        </div>
+        </div >
     );
 }
 
@@ -156,9 +191,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     return {
         props: {
             user: {
-                Email: session?.user?.email
+                email: session?.user?.email
             }
-        },
+        }
     }
 
 }
