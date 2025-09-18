@@ -9,7 +9,17 @@ import { FiShare2 } from "react-icons/fi"
 import { FaTrash } from "react-icons/fa";
 import { ChangeEvent, FormEvent, useState } from "react";
 
-export default function Dashboard() {
+import { db } from '../../services/firebaseConnection'
+
+import { addDoc, collection } from 'firebase/firestore';
+
+interface HomeProps {
+    user: {
+        email: string
+    }
+}
+
+export default function Dashboard({ user }: HomeProps) {
 
     const [input, setInput] = useState("")
     const [publicTask, setPublicTask] = useState(false)
@@ -19,11 +29,24 @@ export default function Dashboard() {
         setPublicTask(event.target.checked)
     }
 
-    function hendleTegisterTask(event: FormEvent) {
-        event.preventDefault()
+    async function handleRegisterTask(event: FormEvent) {
+        event.preventDefault();
 
         if (input === "") return;
-        alert('teste')
+
+        try {
+            await addDoc(collection(db, "tarefas"), {
+                tarefa: input,
+                created: new Date(),
+                user: user,
+                public: publicTask
+            });
+        } catch (err) {
+            console.log(err);
+        }
+
+        setInput("");
+        setPublicTask(false);
     }
 
     return (
@@ -34,7 +57,7 @@ export default function Dashboard() {
 
             <div className="w-full max-w-2xl bg-white shadow-md rounded-2xl p-6 mt-6">
 
-                <form className="flex flex-col gap-4 mb-6" onSubmit={hendleTegisterTask}>
+                <form className="flex flex-col gap-4 mb-6" onSubmit={handleRegisterTask}>
                     <label htmlFor="tarefa" className="text-gray-700 font-medium">
                         Qual sua tarefa?
                     </label>
@@ -131,7 +154,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     }
 
     return {
-        props: {},
+        props: {
+            user: {
+                Email: session?.user?.email
+            }
+        },
     }
 
 }
