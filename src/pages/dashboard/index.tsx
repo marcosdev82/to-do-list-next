@@ -18,6 +18,8 @@ import {
     orderBy,
     where,
     onSnapshot,
+    doc,
+    deleteDoc
 } from 'firebase/firestore';
 
 interface HomeProps {
@@ -95,6 +97,15 @@ export default function Dashboard({ user }: HomeProps) {
         setPublicTask(false);
     }
 
+    async function handleShared(id: string) {
+        await navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_URL}/task/${id}`)
+    }
+
+    async function handleDeleteTask(id: string) {
+        const docRef = doc(db, "tarefas", id);
+        await deleteDoc(docRef);
+    }
+
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center">
             <Head>
@@ -146,6 +157,7 @@ export default function Dashboard({ user }: HomeProps) {
                                     <button
                                         className="flex items-center gap-1 text-blue-500 hover:text-blue-700 transition"
                                         aria-label="Compartilhar tarefa"
+                                        onClick={() => handleShared(item.id)}
                                     >
                                         <FiShare2 size={16} />
                                     </button>
@@ -160,6 +172,7 @@ export default function Dashboard({ user }: HomeProps) {
                                 <button
                                     className="text-red-500 hover:text-red-700 transition"
                                     aria-label="Remover tarefa"
+                                    onClick={() => handleDeleteTask(item.id)}
                                 >
                                     <FaTrash size={16} />
                                 </button>
