@@ -3,6 +3,7 @@
 
 import { getSession } from "next-auth/react";
 import Head from "next/head";
+import Link from "next/link";
 import { GetServerSideProps } from "next";
 import { Textarea } from "@/components/form";
 import { FiShare2 } from "react-icons/fi"
@@ -166,7 +167,14 @@ export default function Dashboard({ user }: HomeProps) {
                             <div className="flex items-center justify-between w-full">
 
                                 <p className="text-gray-800  truncate">
-                                    {item.tarefa}
+
+                                    {item.public ? (
+                                        <Link href={`/task/${item.id}`}>
+                                            {item.tarefa}
+                                        </Link>
+                                    ) : (
+                                        item.tarefa
+                                    )}
                                 </p>
 
                                 <button
