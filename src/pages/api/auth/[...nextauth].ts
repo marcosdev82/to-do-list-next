@@ -20,23 +20,23 @@ export const authOptions: NextAuthOptions = {
   // Chave secreta para criptografia da sessão
   secret: process.env.NEXTAUTH_SECRET,
 
-  // Ativa logs detalhados
-  debug: true,
+  // // Ativa logs detalhados
+  // debug: true,
 
-  // Configurações da sessão
-  session: {
-    strategy: "jwt", // Use JWT para sessões
-  },
+  // // Configurações da sessão
+  // session: {
+  //   strategy: "jwt", // Use JWT para sessões
+  // },
 
-  // Callbacks opcionais podem ser adicionados aqui
-  callbacks: {
-    async jwt({ token }) {
-      return token;
-    },
-    async session({ session, token }) {
-      return session;
-    },
-  },
+  // // Callbacks opcionais podem ser adicionados aqui
+  // callbacks: {
+  //   async jwt({ token }) {
+  //     return token;
+  //   },
+  //   async session({ session, token }) {
+  //     return session;
+  //   },
+  // },
 };
 
 export default NextAuth(authOptions);
