@@ -1,6 +1,3 @@
-// pages/dashboard.tsx
-"use client";
-
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
