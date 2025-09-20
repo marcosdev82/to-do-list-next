@@ -26,6 +26,7 @@ import {
 interface HomeProps {
     user: {
         email: string
+        name: string
     }
 }
 
@@ -34,7 +35,8 @@ interface TaskProps {
     created: Date;
     public: boolean;
     tarefa: string;
-    user: string;
+    email: string;
+    name: string;
 }
 
 export default function Dashboard({ user }: HomeProps) {
@@ -49,9 +51,11 @@ export default function Dashboard({ user }: HomeProps) {
             const q = query(
                 tarefasRef,
                 orderBy("created", "desc"),
-                where("user", "==", user?.email),
+                where("email", "==", user?.email),
 
             )
+
+            console.log(user?.email)
 
             onSnapshot(q, (snapshot) => {
                 let lista = [] as TaskProps[]
@@ -62,7 +66,8 @@ export default function Dashboard({ user }: HomeProps) {
                         tarefa: doc.data().tarefa,
                         created: doc.data().created,
                         public: doc.data().public,
-                        user: doc.data().user
+                        email: doc.data().email,
+                        name: doc.data().name
                     });
                 });
 
@@ -87,7 +92,8 @@ export default function Dashboard({ user }: HomeProps) {
             await addDoc(collection(db, "tarefas"), {
                 tarefa: input,
                 created: new Date(),
-                user: user?.email,
+                email: user?.email,
+                name: user?.name,
                 public: publicTask
             });
         } catch (err) {
@@ -108,12 +114,12 @@ export default function Dashboard({ user }: HomeProps) {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col items-center">
+        <div className="min-h-screen flex flex-col items-center">
             <Head>
                 <title>Painel de tarefas</title>
             </Head>
 
-            <div className="w-full max-w-2xl bg-white shadow-md rounded-2xl p-6 mt-6">
+            <div className="w-full max-w-2xl bg-white rounded-2xl p-6 mt-6">
 
                 <form className="flex flex-col gap-4 mb-6" onSubmit={handleRegisterTask}>
                     <label htmlFor="tarefa" className="text-gray-700 font-medium">
@@ -199,7 +205,7 @@ export default function Dashboard({ user }: HomeProps) {
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
     const session = await getSession({ req })
-
+    console.log(session)
     if (!session?.user) {
         return {
             redirect: {
@@ -212,6 +218,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     return {
         props: {
             user: {
+                name: session?.user?.name,
                 email: session?.user?.email
             }
         }
