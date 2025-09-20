@@ -11,6 +11,8 @@ export const authOptions = {
     ],
     // Chave secreta para criptografia da sessão
     secret: process.env.NEXTAUTH_SECRET as string,
+    debug: true,
+    
     // Configurações da sessão
 };
 

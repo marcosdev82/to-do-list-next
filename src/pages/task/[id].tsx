@@ -11,10 +11,12 @@ import {
     where,
     getDoc,
     addDoc,
-    getDocs
+    getDocs,
+    orderBy
 
 } from 'firebase/firestore';
 import { Textarea } from '@/components/form';
+import { FaTrash } from 'react-icons/fa';
 
 interface TaskProps {
     item: {
@@ -61,11 +63,27 @@ export default function Task({ item, allComments }: TaskProps) {
                 userEmail: session.user.email
             });
 
+            const data = {
+                id: docRef.id,
+                created: new Date().toLocaleDateString(),
+                comment: input,
+                name: session?.user.name,
+                email: session?.user.email,
+                taskId: item?.taskId
+            };
+
+            setComments((prev) => [...prev, data]);
             setInput("");
 
         } catch (error) {
             console.error("Erro ao buscar tarefa:", error);
         }
+    }
+
+    async function handleDeleteComment(id: string) {
+        // const docRef = doc(db, "comments", id);
+        // await docRef.delete();
+        // setComments(comments.filter((item) => item.id !== id));
     }
 
     return (
@@ -79,7 +97,7 @@ export default function Task({ item, allComments }: TaskProps) {
                     <span>Criada por: {item?.email} </span> <br />
                     <span>Data de criação: {item?.created}</span>
                 </div>
-                <div className='mt-4 flex flex-col justify-between items-start bg-gray-60 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 transition'>
+                <div className='mt-4 flex flex-col justify-between items-start bg-gray-60 hover:bg-gray-100 transition'>
                     <p className='text-sm text-gray-600'>{item?.tarefa}</p>
                 </div>
                 <div className='mt-4 text-gray-600'>
@@ -112,10 +130,21 @@ export default function Task({ item, allComments }: TaskProps) {
                     {comments.map((item) => (
                         <li key={item.id} className="flex flex-col justify-between items-start bg-gray-60 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
                             <div className='text-sm text-gray-600 mb-2'>
-                                <span>Comentado por: {item?.email || item.name} </span> <br />
-                                <span>Data: {item?.created}</span>
+                                <span>Comentado por: {item.name} </span>
+
+                                {item.email === session?.user?.email && (
+                                    <button
+                                        className="text-red-500 hover:text-red-700 transition"
+                                        aria-label="Remover tarefa"
+                                        onClick={() => handleDeleteComment(item?.id)}
+                                    >
+                                        <FaTrash size={16} />
+                                    </button>
+                                )}
+
+                                <p>Data: {item?.created}</p>
+                                <p className='mt-2'>{item?.comment}</p>
                             </div>
-                            <p className='text-sm text-gray-600'>{item?.comment}</p>
                         </li>
                     ))}
                 </ul>
@@ -131,12 +160,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
     const q = query(
         collection(db, "comments"),
-        where("taskId", "==", id)
+        where("taskId", "==", id),
+        orderBy("created", "asc")  // ou "desc" para ordem decrescente
     );
 
     const commentsSnapshot = await getDocs(q);
-    console.log(commentsSnapshot)
-
 
     let allComments = [] as CommentProps[];
 
@@ -154,9 +182,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             email: data.userEmail || null,
         });
     });
-
-
-    // console.log(allComments)
 
     const snpshot = await getDoc(docRef);
     // console.log(snpshot.data())
@@ -189,8 +214,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
         name: snpshot.data()?.name ?? null,
         taskId: id,
     }
-
-    console.log('Task:', task);
 
     return {
         props: {
