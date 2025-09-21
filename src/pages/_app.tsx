@@ -1,3 +1,4 @@
+// pages/_app.tsx
 import type { AppProps } from "next/app";
 import { Roboto } from "next/font/google";
 import "@/styles/globals.css";
