@@ -12,7 +12,8 @@ import {
     getDoc,
     addDoc,
     getDocs,
-    orderBy
+    orderBy,
+    deleteDoc
 
 } from 'firebase/firestore';
 import { Textarea } from '@/components/form';
@@ -81,9 +82,16 @@ export default function Task({ item, allComments }: TaskProps) {
     }
 
     async function handleDeleteComment(id: string) {
-        // const docRef = doc(db, "comments", id);
-        // await docRef.delete();
-        // setComments(comments.filter((item) => item.id !== id));
+        try {
+            const docRef = doc(db, "comments", id);
+            await deleteDoc(docRef);
+
+            // Filtra todos os comentários que NÃO têm o id deletado
+            setComments(prev => prev.filter(comment => comment.id !== id));
+
+        } catch (error) {
+            console.error("Erro ao deletar comentário:", error);
+        }
     }
 
     return (
