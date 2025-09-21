@@ -52,8 +52,6 @@ export default function Dashboard({ user }: HomeProps) {
 
             )
 
-            console.log(user?.email)
-
             onSnapshot(q, (snapshot) => {
                 let lista = [] as TaskProps[]
 
@@ -76,7 +74,6 @@ export default function Dashboard({ user }: HomeProps) {
     }, [user?.email])
 
     function handleChangePublic(event: ChangeEvent<HTMLInputElement>) {
-        console.log(event.target.checked)
         setPublicTask(event.target.checked)
     }
 
@@ -202,7 +199,7 @@ export default function Dashboard({ user }: HomeProps) {
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
     const session = await getSession({ req })
-    console.log(session)
+
     if (!session?.user) {
         return {
             redirect: {
