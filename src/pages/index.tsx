@@ -43,7 +43,7 @@ export default function Home({ posts, comments }: HomeProps) {
   );
 }
 
-export const getServerSideProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
 
   const tarefasRef = collection(db, "tarefas");
   const commentsRef = collection(db, "comments");
