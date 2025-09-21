@@ -1,8 +1,18 @@
 import Image from "next/image";
 import hero from "./../../public/imagem-tarefas.png";
 import Head from "next/head";
+import { GetStaticProps } from "next";
 
-export default function Home() {
+import { db } from "../services/firebaseConnection";
+
+import { collection, getDocs } from "firebase/firestore";
+
+interface HomeProps {
+  posts: number;
+  comments: number;
+}
+
+export default function Home({ posts, comments }: HomeProps) {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center">
 
@@ -25,10 +35,27 @@ export default function Home() {
         </h1>
 
         <div className="flex flex-col md:flex-row gap-2 mt-6 text-gray-600 font-medium">
-          <span>+12 Posts</span>
-          <span>+90 Comentários</span>
+          <span>+{posts} Posts</span>
+          <span>+{comments} Comentários</span>
         </div>
       </main>
     </div>
   );
 }
+
+export const getServerSideProps: GetStaticProps = async () => {
+
+  const tarefasRef = collection(db, "tarefas");
+  const commentsRef = collection(db, "comments");
+
+  const tarefasSnapshot = await getDocs(tarefasRef);
+  const commentsSnapshot = await getDocs(commentsRef);
+
+  return {
+    props: {
+      posts: tarefasSnapshot.size || 0,
+      comments: commentsSnapshot.size || 0
+    },
+    revalidate: 60, // 1 minuto
+  };
+};  
