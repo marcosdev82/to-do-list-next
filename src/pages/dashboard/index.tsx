@@ -180,14 +180,15 @@ export default function Dashboard({ user }: HomeProps) {
                                         item.tarefa
                                     )}
                                 </p>
-
-                                <button
-                                    className="text-red-500 hover:text-red-700 transition"
-                                    aria-label="Remover tarefa"
-                                    onClick={() => handleDeleteTask(item.id)}
-                                >
-                                    <FaTrash size={16} />
-                                </button>
+                                {item?.email === user?.email && (
+                                    <button
+                                        className="text-red-500 hover:text-red-700 transition"
+                                        aria-label="Remover tarefa"
+                                        onClick={() => handleDeleteTask(item.id)}
+                                    >
+                                        <FaTrash size={16} />
+                                    </button>
+                                )}
                             </div>
 
                         </li>
