@@ -48,7 +48,7 @@ export default function Dashboard({ user }: HomeProps) {
             const q = query(
                 tarefasRef,
                 orderBy("created", "desc"),
-                where("email", "==", user?.email),
+                // where("email", "==", user?.email),
 
             )
 
