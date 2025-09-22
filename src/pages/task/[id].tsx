@@ -138,7 +138,7 @@ export default function Task({ item, allComments }: TaskProps) {
                     {comments.map((item) => (
                         <li key={item.id} className="flex flex-col justify-between items-start bg-gray-60 p-4 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
                             <div className='text-sm text-gray-600 mb-2'>
-                                <span>Comentado por: {item.name} </span>
+                                <span>Comentado por: {item?.name} </span>
 
                                 {item.email === session?.user?.email && (
                                     <button
@@ -186,7 +186,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             created: new Date(miliseconds).toLocaleDateString(), // agora é string
             comment: data.comment || "",
             taskId: data.taskId || "",
-            name: data.name || "Anônimo",
+            name: data.user || "Anônimo",
             email: data.userEmail || null,
         });
     });
