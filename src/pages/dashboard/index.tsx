@@ -155,6 +155,10 @@ export default function Dashboard({ user }: HomeProps) {
                                     <span className="bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
                                         Público
                                     </span>
+                                    <div className='mt-4 text-sm text-gray-600'>
+                                        <span>Criada por: {item?.name} </span> <br />
+                                        {/* <span>Data de criação: {item?.created}</span> */}
+                                    </div>
                                     <button
                                         className="flex items-center gap-1 text-blue-500 hover:text-blue-700 transition"
                                         aria-label="Compartilhar tarefa"
